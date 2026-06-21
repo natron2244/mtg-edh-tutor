@@ -1,0 +1,106 @@
+// Atraxa Superfriends — sample EDH deck for testing
+
+Commander
+1 Atraxa, Praetors' Voice
+
+Deck
+1 Sol Ring
+1 Command Tower
+1 Arcane Signet
+1 Cultivate
+1 Kodama's Reach
+1 Farseek
+1 Rampant Growth
+1 Nature's Lore
+1 Three Visits
+1 Chromatic Lantern
+1 Talisman of Unity
+1 Talisman of Dominance
+1 Talisman of Progress
+1 Talisman of Resilience
+1 Aura of Silence
+1 Swords to Plowshares
+1 Path to Exile
+1 Counterspell
+1 Mana Drain
+1 Swan Song
+1 Teferi, Hero of Dominaria
+1 Liliana Vess
+1 Garruk Wildspeaker
+1 Elspeth, Sun's Champion
+1 Tamiyo, Field Researcher
+1 Nissa, Who Shakes the World
+1 Vraska, Golgari Queen
+1 Jace, the Mind Sculptor
+1 Deepglow Skate
+1 Doubling Season
+1 Contagion Engine
+1 Inexorable Tide
+1 Viral Drake
+1 Thrummingbird
+1 Evolution Sage
+1 Wandering Archaic
+1 Fathom Mage
+1 Atraxa, Grand Unifier
+1 Vorinclex, Monstrous Raider
+1 Phyrexian Altar
+1 Proliferate
+1 The Ozolith
+1 Astral Cornucopia
+1 Everflowing Chalice
+1 Crystalline Crawler
+1 Lighthouse Chronologist
+1 Magistrate's Scepter
+1 Nesting Grounds
+1 Flux Channeler
+1 Karn's Bastion
+1 Gavony Township
+1 Yavimaya, Cradle of Growth
+1 Boseiju, Who Endures
+1 Otawara, Soaring City
+1 Underground Sea
+1 Tropical Island
+1 Tundra
+1 Bayou
+1 Savannah
+1 Scrubland
+1 Watery Grave
+1 Breeding Pool
+1 Hallowed Fountain
+1 Godless Shrine
+1 Overgrown Tomb
+1 Temple Garden
+1 Flooded Strand
+1 Polluted Delta
+1 Windswept Heath
+1 Misty Rainforest
+1 Marsh Flats
+1 Verdant Catacombs
+1 Plains
+1 Island
+1 Swamp
+1 Forest
+1 Plains
+1 Island
+1 Swamp
+1 Forest
+1 Plains
+1 Island
+1 Swamp
+1 Forest
+1 Plains
+1 Island
+1 Swamp
+1 Forest
+1 Plains
+1 Island
+1 Swamp
+1 Forest
+1 Plains
+1 Island
+1 Swamp
+1 Forest
+1 Plains
+1 Island
+1 Swamp
+1 Forest
