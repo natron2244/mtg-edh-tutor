@@ -18,6 +18,7 @@ class OllamaClient(LLMClient):
         system: str | None = None,
         tools: list[ToolDefinition] | None = None,
         stream: bool = False,
+        response_format: str | None = None,
     ) -> LLMResponse:
         payload: dict[str, Any] = {
             "model": self._model,
@@ -26,6 +27,8 @@ class OllamaClient(LLMClient):
         }
         if tools:
             payload["tools"] = [self._encode_tool(t) for t in tools]
+        if response_format == "json":
+            payload["format"] = "json"
 
         async with httpx.AsyncClient(timeout=120.0) as client:
             resp = await client.post(f"{self._base_url}/api/chat", json=payload)

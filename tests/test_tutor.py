@@ -20,24 +20,30 @@ def _card(name: str, cmc: float, type_line: str, oracle: str = "", colors: list[
 
 
 def test_mana_curve_lands_excluded():
-    cards = [
-        _card("Command Tower", 0, "Land"),
-        _card("Sol Ring", 1, "Artifact", "add {C}{C}"),
-        _card("Counterspell", 2, "Instant", "counter target spell"),
+    entries = [
+        (1, _card("Command Tower", 0, "Land")),
+        (1, _card("Sol Ring", 1, "Artifact", "add {C}{C}")),
+        (1, _card("Counterspell", 2, "Instant", "counter target spell")),
     ]
-    curve = build_mana_curve(cards)
+    curve = build_mana_curve(entries)
     assert curve.land_count == 1
     assert 1 in curve.distribution
     assert 2 in curve.distribution
     assert 0 not in curve.distribution  # land not bucketed
 
 
+def test_mana_curve_quantity_respected():
+    entries = [(30, _card("Mountain", 0, "Basic Land — Mountain"))]
+    curve = build_mana_curve(entries)
+    assert curve.land_count == 30
+
+
 def test_mana_curve_average():
-    cards = [
-        _card("A", 2, "Instant"),
-        _card("B", 4, "Sorcery"),
+    entries = [
+        (1, _card("A", 2, "Instant")),
+        (1, _card("B", 4, "Sorcery")),
     ]
-    curve = build_mana_curve(cards)
+    curve = build_mana_curve(entries)
     assert curve.average_cmc() == 3.0
 
 

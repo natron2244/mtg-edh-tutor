@@ -17,6 +17,7 @@ class ClaudeClient(LLMClient):
         system: str | None = None,
         tools: list[ToolDefinition] | None = None,
         stream: bool = False,
+        response_format: str | None = None,
     ) -> LLMResponse:
         raise NotImplementedError(
             "ClaudeClient is a future integration. Set LLM_PROVIDER=ollama to use Ollama."

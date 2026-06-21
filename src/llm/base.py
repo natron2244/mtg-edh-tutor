@@ -67,4 +67,5 @@ class LLMClient(ABC):
         system: str | None = None,
         tools: list[ToolDefinition] | None = None,
         stream: bool = False,
+        response_format: str | None = None,  # "json" to request JSON-only output
     ) -> LLMResponse: ...

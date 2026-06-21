@@ -91,14 +91,18 @@ def _type(card: Card) -> str:
     return card.type_line.lower()
 
 
-def build_mana_curve(cards: list[Card]) -> ManaCurve:
+def build_mana_curve(entries: list[tuple[int, Card]]) -> ManaCurve:
+    """
+    Build a mana curve from (quantity, Card) pairs so that
+    e.g. 30 Mountains count as 30 lands, not 1.
+    """
     curve = ManaCurve()
-    for card in cards:
+    for qty, card in entries:
         if "land" in _type(card):
-            curve.land_count += 1
+            curve.land_count += qty
         else:
             bucket = min(int(card.cmc), 7)
-            curve.distribution[bucket].append(card.name)
+            curve.distribution[bucket].extend([card.name] * qty)
     return curve
 
 
