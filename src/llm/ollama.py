@@ -42,12 +42,25 @@ class OllamaClient(LLMClient):
             result.append({"role": "system", "content": system})
         for msg in messages:
             if msg.role == Role.TOOL:
-                result.append({
-                    "role": "tool",
-                    "content": msg.content,
-                })
+                result.append({"role": "tool", "content": msg.content or ""})
+            elif msg.role == Role.ASSISTANT and msg.tool_calls:
+                # Round-trip assistant tool-call messages back to Ollama format
+                encoded: dict[str, Any] = {
+                    "role": "assistant",
+                    "content": msg.content or "",
+                    "tool_calls": [
+                        {
+                            "function": {
+                                "name": tc.name,
+                                "arguments": tc.arguments,
+                            }
+                        }
+                        for tc in msg.tool_calls
+                    ],
+                }
+                result.append(encoded)
             else:
-                result.append({"role": msg.role.value, "content": msg.content})
+                result.append({"role": msg.role.value, "content": msg.content or ""})
         return result
 
     def _encode_tool(self, tool: ToolDefinition) -> dict[str, Any]:

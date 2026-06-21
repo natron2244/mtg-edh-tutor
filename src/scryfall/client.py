@@ -1,4 +1,5 @@
 import asyncio
+import time
 from typing import Any
 
 import httpx
@@ -24,27 +25,40 @@ class ScryfallClient:
         self._base_url = (base_url or settings.scryfall_base_url).rstrip("/")
         self._delay = rate_limit_delay if rate_limit_delay is not None else settings.scryfall_rate_limit_delay
         self._last_request: float = 0.0
+        # Lazy: must be created inside a running event loop.
+        self._lock: asyncio.Lock | None = None
+
+    def _get_lock(self) -> asyncio.Lock:
+        if self._lock is None:
+            self._lock = asyncio.Lock()
+        return self._lock
 
     async def _get(self, path: str, **params: Any) -> dict[str, Any]:
         await self._throttle()
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            resp = await client.get(
-                f"{self._base_url}{path}",
-                params=params or None,
-                headers={"User-Agent": "mtg-edh-tutor/0.1 (github.com/user/mtg-edh-tutor)"},
-            )
-            if resp.status_code == 404:
-                raise CardNotFoundError(f"Not found: {path}")
-            resp.raise_for_status()
-            return resp.json()  # type: ignore[no-any-return]
+        for attempt in range(4):
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                resp = await client.get(
+                    f"{self._base_url}{path}",
+                    params=params or None,
+                    headers={"User-Agent": "mtg-edh-tutor/0.1 (github.com/user/mtg-edh-tutor)"},
+                )
+                if resp.status_code == 404:
+                    raise CardNotFoundError(f"Not found: {path}")
+                if resp.status_code == 429:
+                    wait = 2 ** attempt  # 1s, 2s, 4s, 8s
+                    await asyncio.sleep(wait)
+                    continue
+                resp.raise_for_status()
+                return resp.json()  # type: ignore[no-any-return]
+        raise ScryfallError(f"Scryfall rate-limited after retries: {path}")
 
     async def _throttle(self) -> None:
-        import time
-        now = time.monotonic()
-        elapsed = now - self._last_request
-        if elapsed < self._delay:
-            await asyncio.sleep(self._delay - elapsed)
-        self._last_request = time.monotonic()
+        async with self._get_lock():
+            now = time.monotonic()
+            elapsed = now - self._last_request
+            if elapsed < self._delay:
+                await asyncio.sleep(self._delay - elapsed)
+            self._last_request = time.monotonic()
 
     async def get_card_by_name(self, name: str, exact: bool = True) -> Card:
         """Fetch a single card by name. Uses /cards/named endpoint."""

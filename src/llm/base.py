@@ -13,8 +13,9 @@ class Role(str, Enum):
 @dataclass
 class Message:
     role: Role
-    content: str
+    content: str | None  # None when assistant responds with only tool calls
     tool_call_id: str | None = None  # populated when role == TOOL
+    tool_calls: list["ToolCall"] = field(default_factory=list)  # populated when role == ASSISTANT
 
 
 @dataclass
