@@ -1,0 +1,97 @@
+Commander
+1 Atraxa, Praetors' Voice
+
+Deck
+1 Command Tower
+1 Breeding Pool
+1 Godless Shrine
+1 Hallowed Fountain
+1 Overgrown Tomb
+1 Watery Grave
+1 Temple Garden
+1 Indatha Triome
+1 Zagoth Triome
+1 Raffine's Tower
+1 Spara's Headquarters
+1 Morphic Pool
+1 Bountiful Promenade
+1 Rejuvenating Springs
+1 Vault of Champions
+4 Plains
+4 Island
+4 Swamp
+1 Forest
+
+1 Sol Ring
+1 Arcane Signet
+1 Commander's Sphere
+1 Cultivate
+1 Kodama's Reach
+1 Farseek
+1 Nature's Lore
+1 Chromatic Lantern
+
+1 Managorger Hydra
+1 Kalonian Hydra
+1 Crystalline Crawler
+1 Forgotten Ancient
+1 Mindless Automaton
+1 Spike Weaver
+1 Spike Feeder
+1 Armorcraft Judge
+1 Champion of Lambholt
+1 Deepglow Skate
+1 Fathom Mage
+1 Grateful Apparition
+1 Herald of Secret Streams
+1 Hornet Queen
+1 Ichor Rats
+1 Sage of Hours
+1 Walking Ballista
+1 Hangarback Walker
+1 Vorel of the Hull Clade
+1 Fertilid
+1 Reef Worm
+1 Mulldrifter
+1 Solemn Simulacrum
+1 Eternal Witness
+1 Master Biomancer
+1 Zameck Guildmage
+1 Vigean Graftmage
+1 Cytoplast Root-Kin
+1 Viral Drake
+1 Plaguemaw Beast
+1 Thrummingbird
+1 Yisan, the Wanderer Bard
+1 Gyre Sage
+1 Bloodspore Thrinax
+1 Lighthouse Chronologist
+
+1 Cyclonic Rift
+1 Swords to Plowshares
+1 Path to Exile
+1 Wrath of God
+1 Demonic Tutor
+1 Vampiric Tutor
+1 Inexorable Tide
+1 Contagion Engine
+1 Contagion Clasp
+1 Sword of Truth and Justice
+1 The Ozolith
+1 Hardened Scales
+1 Doubling Season
+1 Inspiring Call
+1 Contentious Plan
+1 Tezzeret's Gambit
+1 Fuel for the Cause
+1 Steady Progress
+1 Spread the Sickness
+1 Grim Affliction
+1 Ajani Steadfast
+1 Nissa, Voice of Zendikar
+1 Liliana, the Last Hope
+1 Garruk Wildspeaker
+1 Tamiyo, Collector of Tales
+1 Phyrexian Arena
+1 Greater Good
+1 Merciless Eviction

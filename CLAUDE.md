@@ -27,6 +27,15 @@ All I/O is async (`httpx`, `asyncio`). CLI entry points use `asyncio.run()`.
 ## Source Layout
 
 ```
+evals/
+├── datasets/
+│   ├── krenko_ramp_light.txt  # 100-card Krenko deck — only 2 ramp pieces (flaw: needs ~10)
+│   └── atraxa_land_light.txt  # 100-card Atraxa deck — only 28 lands (flaw: needs 36-38)
+├── cases.py                   # EvalCase pydantic model + EVAL_SUITE list
+├── graders.py                 # CodeGrader (structural checks) + ModelGrader (Ollama-as-judge)
+├── runner.py                  # run_suite() — feeds cases through TutorSession then graders
+└── main.py                    # CLI entry point
+
 src/
 ├── config.py              # pydantic-settings — reads .env
 ├── llm/
@@ -83,7 +92,30 @@ uv run pytest tests/
 
 # Type check
 uv run mypy src/
+
+# Run prompt evals (requires Ollama running)
+uv run python -m evals.main
+
+# Run a single eval case
+uv run python -m evals.main --case krenko_ramp_light
+
+# Run evals with full grader output
+uv run python -m evals.main --verbose
 ```
+
+## Prompt Eval System
+
+The `evals/` package tests the quality of `SYSTEM_PROMPT` + `DeckReport` output against decklists with known, intentional flaws.
+
+**Two grading strategies:**
+- `CodeGrader` — deterministic: checks `DeckReport.power_level` range, `weaknesses` contain expected keywords, `suggestions` count meets minimum
+- `ModelGrader` — uses Ollama as a judge: given the `DeckReport` JSON and plain-English known issues, it scores whether each issue was identified
+
+**Adding a new test case:**
+1. Drop a `.txt` decklist (standard MTGO format) in `evals/datasets/`
+2. Add an `EvalCase` to `EVAL_SUITE` in `evals/cases.py` with `expected_weakness_keywords`, `expected_power_level_max`, and `known_issues`
+
+The eval runner calls `TutorSession.start()` for the full pipeline (Scryfall + Ollama), so Ollama must be running.
 
 ## Deck File Format
 Standard MTGO / Moxfield plain-text format. Section headers (case-insensitive) are optional:
