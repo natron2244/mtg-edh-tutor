@@ -17,7 +17,8 @@ from src.scryfall import ScryfallClient
 from src.tutor.analysis import build_mana_curve, categorize_cards
 from src.tutor.cache import CardCache
 from src.tutor.prompts import SYSTEM_PROMPT, format_deck_for_prompt
-from src.tutor.structured import DeckReport, extract_structured_report
+from src.tutor.document import DeckDocument
+from src.tutor.structured import DeckReport, extract_chat_suggestions, extract_structured_report
 from src.tutor.tools import ALL_TOOLS, execute_tool
 
 MAX_TOOL_ROUNDS = 10
@@ -35,6 +36,7 @@ class TutorSession:
     cache: CardCache
     history: list[Message] = field(default_factory=list)
     report: DeckReport | None = None
+    document: DeckDocument | None = None
 
     # ------------------------------------------------------------------
     # Factory
@@ -46,6 +48,7 @@ class TutorSession:
         deck: Deck,
         progress: Progress | None = None,
         cache_dir=None,
+        output_path=None,
     ) -> tuple["TutorSession", str, DeckReport | None]:
         """
         Bootstrap a session: prefetch cards, run initial analysis, extract
@@ -98,6 +101,16 @@ class TutorSession:
         report = await extract_structured_report(llm, session.history, SYSTEM_PROMPT)
         session.report = report
 
+        # ------------------------------------------------------------------
+        # 5. Living analysis document
+        # ------------------------------------------------------------------
+        cmd_name = deck.commander.name if deck.commander else "Unknown Commander"
+        doc = DeckDocument.create(cmd_name, output_path=output_path)
+        if report:
+            doc.apply_initial_report(report)
+        doc.write()
+        session.document = doc
+
         return session, prose, report
 
     # ------------------------------------------------------------------
@@ -116,7 +129,16 @@ class TutorSession:
 
         self.history.append(Message(role=Role.USER, content=user_message))
         _log("Thinking…")
-        return await self._run_agentic_loop(progress=_log)
+        response = await self._run_agentic_loop(progress=_log)
+
+        if self.document is not None:
+            _log("Updating analysis document…")
+            suggestions = await extract_chat_suggestions(self.llm, self.history, SYSTEM_PROMPT)
+            note = user_message[:120] if len(user_message) > 120 else user_message
+            self.document.merge_chat_suggestions(suggestions, note=note)
+            self.document.write()
+
+        return response
 
     # ------------------------------------------------------------------
     # Internal: agentic tool-use loop

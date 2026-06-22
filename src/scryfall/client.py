@@ -36,21 +36,26 @@ class ScryfallClient:
     async def _get(self, path: str, **params: Any) -> dict[str, Any]:
         await self._throttle()
         for attempt in range(4):
-            async with httpx.AsyncClient(timeout=10.0) as client:
-                resp = await client.get(
-                    f"{self._base_url}{path}",
-                    params=params or None,
-                    headers={"User-Agent": "mtg-edh-tutor/0.1 (github.com/user/mtg-edh-tutor)"},
-                )
-                if resp.status_code == 404:
-                    raise CardNotFoundError(f"Not found: {path}")
-                if resp.status_code == 429:
-                    wait = 2 ** attempt  # 1s, 2s, 4s, 8s
-                    await asyncio.sleep(wait)
-                    continue
-                resp.raise_for_status()
-                return resp.json()  # type: ignore[no-any-return]
-        raise ScryfallError(f"Scryfall rate-limited after retries: {path}")
+            try:
+                async with httpx.AsyncClient(timeout=30.0) as client:
+                    resp = await client.get(
+                        f"{self._base_url}{path}",
+                        params=params or None,
+                        headers={"User-Agent": "mtg-edh-tutor/0.1 (github.com/user/mtg-edh-tutor)"},
+                    )
+            except (httpx.ReadTimeout, httpx.ConnectTimeout, httpx.ConnectError):
+                wait = 2 ** attempt  # 1s, 2s, 4s, 8s
+                await asyncio.sleep(wait)
+                continue
+            if resp.status_code == 404:
+                raise CardNotFoundError(f"Not found: {path}")
+            if resp.status_code == 429:
+                wait = 2 ** attempt
+                await asyncio.sleep(wait)
+                continue
+            resp.raise_for_status()
+            return resp.json()  # type: ignore[no-any-return]
+        raise ScryfallError(f"Scryfall request failed after retries: {path}")
 
     async def _throttle(self) -> None:
         async with self._get_lock():
@@ -92,7 +97,7 @@ class ScryfallClient:
             try:
                 card = await self.get_card_by_name(name, exact=False)
                 return name, card
-            except (CardNotFoundError, ScryfallError):
+            except (CardNotFoundError, ScryfallError, httpx.TimeoutException):
                 return name, None
 
         results = await asyncio.gather(*[_fetch(n) for n in names])

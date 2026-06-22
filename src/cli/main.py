@@ -42,6 +42,10 @@ def analyze(
         False, "--no-chat",
         help="Exit after the initial analysis (skip the interactive loop).",
     ),
+    output: Optional[Path] = typer.Option(
+        None, "--output", "-o",
+        help="Path for the living analysis markdown file (default: <commander>_analysis.md).",
+    ),
 ) -> None:
     """Analyze a Commander deck, then enter an interactive Q&A session."""
 
@@ -63,6 +67,7 @@ def analyze(
     prose: str = ""
     report: DeckReport | None = None
     error: Exception | None = None
+    error_tb: str = ""
 
     with Status("[bold yellow]Analyzing deck…[/bold yellow]", console=console, spinner="dots") as status:
         def on_progress(msg: str) -> None:
@@ -70,13 +75,16 @@ def analyze(
 
         try:
             session, prose, report = asyncio.run(
-                TutorSession.start(deck, progress=on_progress)
+                TutorSession.start(deck, progress=on_progress, output_path=output)
             )
         except Exception as e:
+            import traceback
             error = e
+            error_tb = traceback.format_exc()
 
     if error:
-        console.print(f"[red]Analysis failed:[/red] {error}")
+        console.print(f"[red]Analysis failed:[/red] {error!r}")
+        console.print(error_tb)
         raise typer.Exit(1)
 
     console.print()
@@ -85,6 +93,10 @@ def analyze(
     if report:
         console.print()
         _print_report_panel(report)
+
+    if session is not None and session.document is not None:
+        console.print()
+        console.print(f"[dim]Analysis saved to:[/dim] [cyan]{session.document.path}[/cyan]")
 
     if no_chat or session is None:
         return
@@ -156,6 +168,8 @@ def analyze(
         else:
             console.print()
             console.print(Markdown(response))
+            if session.document is not None:
+                console.print(f"[dim]✓ Document updated: {session.document.path}[/dim]")
             console.print()
 
 

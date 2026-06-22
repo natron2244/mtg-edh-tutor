@@ -30,7 +30,9 @@ class OllamaClient(LLMClient):
         if response_format == "json":
             payload["format"] = "json"
 
-        async with httpx.AsyncClient(timeout=120.0) as client:
+        # read=None: LLM generation can take arbitrarily long; fail fast only on connect
+        timeout = httpx.Timeout(connect=10.0, read=None, write=60.0, pool=10.0)
+        async with httpx.AsyncClient(timeout=timeout) as client:
             resp = await client.post(f"{self._base_url}/api/chat", json=payload)
             resp.raise_for_status()
             data = resp.json()

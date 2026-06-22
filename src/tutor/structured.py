@@ -64,6 +64,36 @@ def _extract_json(text: str) -> str:
     return text[start:]
 
 
+CHAT_EXTRACTION_PROMPT = """\
+From your response above, extract any specific card swap suggestions as JSON. \
+Output ONLY valid JSON with no prose or markdown fences:
+{"suggestions": [{"cut": "<card to remove>", "add": "<card to add>", "reason": "<why>"}]}
+If there are no specific swaps, return {"suggestions": []}.
+"""
+
+
+async def extract_chat_suggestions(
+    llm: LLMClient,
+    conversation_history: list[Message],
+    system: str,
+) -> list[Suggestion]:
+    """
+    After a chat turn, distil any swap suggestions the model mentioned into a
+    structured list. Returns [] on parse failure — treat as "no new suggestions."
+    """
+    messages = list(conversation_history) + [
+        Message(role=Role.USER, content=CHAT_EXTRACTION_PROMPT)
+    ]
+    response = await llm.chat(messages, system=system, tools=None, response_format="json")
+    raw = response.content or ""
+    try:
+        json_str = _extract_json(raw)
+        data = json.loads(json_str)
+        return [Suggestion.model_validate(s) for s in data.get("suggestions", [])]
+    except Exception:
+        return []
+
+
 async def extract_structured_report(
     llm: LLMClient,
     conversation_history: list[Message],
